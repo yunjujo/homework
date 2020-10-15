@@ -62,57 +62,6 @@
         }
     </style>
 
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                type: "GET",
-                url: "https://api.manana.kr/exchange/rate.json",
-                data: {},
-                success: function (response) {
-                    let nowRate = response[1]['rate'];
-                    $('#rate-box').text(nowRate)
-                }
-            })
-        });
-
-        function order() {
-            let name = $('#order-name').val();
-            let count = $('#order-count').val();
-            let address = $('#order-address').val();
-            let phone = $('#order-phone').val();
-
-            if (name == '') {
-                alert('이름을 입력하세요.');
-                return;
-            }
-            else if(count == '')
-            {
-                alert('수량을 선택하세요.');
-                return;
-            }
-            else if(address == '')
-            {
-                alert('주소를 입력하세요.');
-                return;
-            }
-            else if(phone == '')
-            {
-                alert('휴대폰 번호를 입력하세요.');
-                return;
-            }
-            alert('주문이 완료되었습니다.')
-
-            let temp_html = `<tr>
-                <td>${name}</td>
-                <td>${count}</td>
-                <td>${address}</td>
-                <td>${phone}</td>
-            </tr>`
-
-            $("#orders-box").append(temp_html);
-        }
-
-    </script>
 </head>
 <body>
 <div class="wrap">
@@ -152,7 +101,7 @@
             <input id="order-phone" type="text" class="form-control">
         </div>
         <div class="order">
-            <button onclick="order()" type="button" class="btn btn-primary">주문하기</button>
+            <button type="button" class="btn btn-primary">주문하기</button>
         </div>
     </div>
     <div class="orders">
