@@ -33,7 +33,7 @@
         }
 
         .img {
-            background-image: url('https://lh3.googleusercontent.com/proxy/4am_OfieHrqcBKRsyWLv1jOp9gm90b5UuLtpoov5alQjCsvD2pNqhcmguwl-Pj6b9iAdozCa4oSFq1qEFbYY0RiT-yyDv-1I-ncDHdbm4P3omn2nQr326mpWW-yN3unCxZRimj805qqTacVeT0OTkxJTzvBpX944k-edaVuoIol6_DHzwrniNtoUJeOpqPeSFhOIhgFOa6fOOdeXyQBLHRVoJHNpn8eU883M9f3ZEiFXoooc4BjMnpbijkdAfVYNbk7OWioKC6R1pc6OFVO_-2el78Pt2ql30_8v62DT');
+            background-image: url('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMDAzMDFfNTMg%2FMDAxNTgzMDUyMjgwMzI1.zvNC-WGRooa8aNq7Ll5lwe7IxBGglbMR-5kvPuJWo_og.A8AOZJFyXLo6IQsNJDM9_SxDxFr7T8cTxmKp3MKNSLsg.JPEG.book0884%2Fvad.jpg&type=sc960_832')
             background-size: cover;
             background-position: center;
             width: 500px;
@@ -61,7 +61,51 @@
             color: blue;
         }
     </style>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    let nowRate = response[1]['rate'];
+                    $('#rate-box').text(nowRate)
+                }
+            })
+        });
 
+        function order() {
+            let name = $('#order-name').val();
+            let count = $('#order-count').val();
+            let address = $('#order-address').val();
+            let phone = $('#order-phone').val();
+
+            if (name == '') {
+                alert('이름을 입력하세요.');
+                return;
+            } else if (count == '') {
+                alert('수량을 선택하세요.');
+                return;
+            } else if (address == '') {
+                alert('주소를 입력하세요.');
+                return;
+            } else if (phone == '') {
+                alert('휴대폰 번호를 입력하세요.');
+                return;
+            }
+            alert('주문이 완료되었습니다.')
+
+            let temp_html = `<tr>
+                <td>${name}</td>
+                <td>${count}</td>
+                <td>${address}</td>
+                <td>${phone}</td>
+            </tr>`
+
+            $("#orders-box").append(temp_html);
+        }
+
+    </script>
 </head>
 <body>
 <div class="wrap">
