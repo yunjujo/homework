@@ -1,0 +1,225 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+
+
+    <title>Music4U</title>
+
+    <!-- style -->
+    <style type="text/css">
+        * {
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        .wrap {
+            width: 1000px;
+            margin: auto;
+        }
+
+        .jumbotron {
+            background-image: url('https://cdn.crowdpic.net/list-thumb/thumb_l_BC43EB41420C83F3A3A85E7D63FCE2B3.jpg');
+            background-position: center;
+            background-size: cover;
+        }
+
+        .display-4 lead {
+            text-align: center;
+        }
+
+        .comment {
+            color: #6495ED;
+        }
+
+        #post-box {
+            width: 1000px;
+            margin: 20px auto;
+            padding: 50px;
+            border: #E6E6FA solid;
+            border-radius: 5px;
+        }
+        .card-footer-item {
+            text-align: right;
+            padding: 10px;
+        }
+        svg {
+            vertical-align: text-top;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $("#cards-box").html("");
+            showArticles();
+        });
+
+        function openClose() {
+            // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
+            if ($("#post-box").css("display") == "block") {
+                // post-box를 가리고
+                $("#post-box").hide();
+                // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box").text("등록");
+            } else {
+                // 아니면(눈에 보이지 않으면) post-box를 펴라
+                $("#post-box").show();
+                // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+                $("#btn-post-box").text("닫기");
+            }
+        }
+
+        function postArticle() {
+            let url = $('#post-url').val();
+            let comment = $('#post-comment').val();
+            let lyrics = $('#post-lyrics').val();
+
+            if (url == "") {
+                alert("음악 URL이 없어요!");
+                return;
+            } else if (lyrics == "") {
+                alert("기억에 남는 가사가 없다니 슬퍼요! 꼭 입력해주세요!");
+                return;
+            } else if (comment == "") {
+                alert("추천 이유를 작성해주세요! 당신의 생각이 궁금해요.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: {'url_give': url, 'comment_give': comment, 'lyrics_give': lyrics},
+                success: function (response) { // 성공하면
+                    if (response["result"] == "success") {
+                        alert("잘 저장해둘게요!");
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+
+        function showArticles() {
+            $.ajax({
+                type: "GET",
+                url: "/memo",
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        let music_save = response['musics'];
+
+                        for (i = 0; i < music_save.length; i++) {
+                            let title = music_save[i]['title'];
+                            let url = music_save[i]['url'];
+                            let image = music_save[i]['image'];
+                            let desc = music_save[i]['desc'];
+                            let comment = music_save[i]['comment'];
+                            let like = music_save[i]['like'];
+                            let tempHtml = `
+                        <div class="card">
+                            <img class="card-img-top" src="${image}" alt="Card image cap">
+                            <div class="card-body">
+                                <a href="${url}" target="_blank" class="card-title">${title}</a>
+                                <p class="card-text">${desc}</p>
+                                <p class="card-text comment">${comment}</p>
+                            </div>
+                            <div class="card-footer-item">
+                              <a href="#" onclick="likeStar('${title.replace("\'", " ")}')" > ${like}
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+</svg>
+                              </a>
+                            </div>
+                        </div>`;
+                            $('#cards-box').append(tempHtml);
+                        }
+                    }
+                }
+            })
+        }
+
+        function likeStar(title) {
+            $.ajax({
+                type: 'POST',
+                url: '/memo/like',
+                data: {
+                    'title_give' : title
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let msg = response['msg'];
+                        alert(msg);
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+
+    </script>
+
+</head>
+
+<body>
+<div class="wrap">
+    <div class="jumbotron">
+        <h1 class="display-4">당신에게 추천해요, 이 노래</h1>
+        <p class="lead">문득 떠오른 가사, 다시 듣고 싶은 노래, 당신을 위해 저장해둘게요.</p>
+        <hr class="my-4">
+        <p class="lead">
+            <button onclick="openClose()" id="btn-post-box" type="button" class="btn btn-primary">등록
+            </button>
+        </p>
+    </div>
+    <div id="post-box" class="form-post" style="display:none">
+        <div>
+            <p class="post-desc">멜론의 음악 url을 입력하면, 음악 정보는 자동으로 입력됩니다. 기억에 남는 가사와 이 노래를 추천하는 이유를 남겨보세요.</p>
+            <a href="https://www.melon.com/chart/index.htm" target="_blank">멜론(Melon)으로 가기</a>
+            <hr/>
+            <div class="form-group">
+                <label for="post-url">Music URL</label>
+                <input id="post-url" class="form-control" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="post-url">기억에 남는 가사</label>
+                <textarea id="post-lyrics" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="post-comment">이 노래를 추천하는 이유</label>
+                <textarea id="post-comment" class="form-control" rows="5"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="postArticle()">저장</button>
+        </div>
+    </div>
+    <div id="cards-box" class="card-columns">
+        <div class="card">
+            <img class="card-img-top"
+                 src="https://www.eurail.com/content/dam/images/eurail/Italy%20OCP%20Promo%20Block.adaptive.767.1535627244182.jpg"
+                 alt="Card image cap">
+            <div class="card-body">
+                <a href="#" class="card-title">여기 노래 제목이 들어갑니다.</a>
+                <p class="card-text">기억에 남는 가사가 들어갑니다.</p>
+                <p class="card-text comment">당신의 추천 이유가 들어갑니다.</p>
+            </div>
+            <div>
+                좋아요 싫어요
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
